@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    " I ",
+    "   "
+  ],
+  "key": {
+    "I": {
+      "item": "robguns:musket"
+    },
+    "S": {
+      "item": "minecraft:spyglass"
+    }
+  },
+  "result": {
+    "item": "robguns:scoped_musket",
+    "count": 1
+  }
+}

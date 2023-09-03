@@ -202,7 +202,7 @@ public class GunItem extends Item {
         return compoundtag != null && compoundtag.getBoolean("Charged");
     }
 
-    public static void setCharged(ItemStack pCrossbowStack, boolean pIsCharged) {
+    public void setCharged(ItemStack pCrossbowStack, boolean pIsCharged) {
         CompoundTag compoundtag = pCrossbowStack.getOrCreateTag();
         compoundtag.putBoolean("Charged", pIsCharged);
     }

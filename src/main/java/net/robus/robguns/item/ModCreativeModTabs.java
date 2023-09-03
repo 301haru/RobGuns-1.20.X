@@ -19,6 +19,8 @@ public class ModCreativeModTabs {
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(ModItems.MUSKET.get());
                         pOutput.accept(ModItems.FLINTLOCK.get());
+                        pOutput.accept(ModItems.SCOPED_MUSKET.get());
+                        pOutput.accept(ModItems.BLUNDERBUSS.get());
                         pOutput.accept(ModItems.ROUND_BALL.get());
                     })
                     .build());

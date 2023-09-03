@@ -30,8 +30,6 @@ public class RobGuns {
         ModItems.register(modEventBus);
         ModEntities.register(modEventBus);
 
-
-
         MinecraftForge.EVENT_BUS.register(this);
         modEventBus.addListener(this::addCreative);
     }

@@ -1,0 +1,18 @@
+{
+  "parent": "minecraft:item/handheld",
+  "loader": "forge:separate_transforms",
+  "base": {
+    "parent": "robguns:item/blunderbuss_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "robguns:item/blunderbuss_2d"
+    },
+    "ground": {
+      "parent": "robguns:item/blunderbuss_2d"
+    },
+    "fixed": {
+      "parent": "robguns:item/blunderbuss_2d"
+    }
+  }
+}
