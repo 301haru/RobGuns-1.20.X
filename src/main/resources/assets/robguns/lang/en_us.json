@@ -2,7 +2,9 @@
   "item.robguns.flintlock": "Flintlock",
   "item.robguns.musket": "Musket",
   "item.robguns.blunderbuss": "Blunderbuss",
+  "item.robguns.dragons_breath": "Dragons Breath",
   "item.robguns.scoped_musket": "Scoped Musket",
+  "item.robguns.gub_gun": "Gub Gun",
   "item.robguns.round_ball": "Round Ball",
   "creativetab.rob_guns_tab": "Rob Guns Tab"
 }

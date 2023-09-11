@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures" : {
+    "layer0": "robguns:item/dragons_breath_texture_2d"
+  }
+}

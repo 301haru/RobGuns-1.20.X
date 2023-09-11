@@ -1,4 +1,4 @@
-package net.robus.robguns.item;
+package net.robus.robguns.item.mod_items;
 
 import com.google.common.collect.Lists;
 import net.minecraft.core.particles.ParticleTypes;
@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -18,7 +19,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.robus.robguns.entity.ModEntities;
-import net.robus.robguns.entity.RoundBallProjectile;
+import net.robus.robguns.entity.mod_entities.custom_entities.RoundBallProjectile;
+import net.robus.robguns.item.ModItems;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -29,6 +31,10 @@ public class GunItem extends Item {
     private boolean twoHanded = false;
     private int chargeTime = 20;
     private float damage = 11f;
+    private float projectileVelocity = 3;
+    private boolean scoped = false;
+    private float fovModifier = 0.25f;
+    private float inaccuracy = 0.1f;
     private static final Random random = new Random();
 
     public GunItem(Properties pProperties) {
@@ -47,14 +53,13 @@ public class GunItem extends Item {
         }
 
         projectile.setDamage(getAttackDamage(itemStack));
-        projectile.setNoGravity(true);
 
         Vec3 vec31 = entity.getUpVector(1.0F);
         Quaternionf quaternionf = (new Quaternionf()).setAngleAxis(0 * ((float) Math.PI / 180F), vec31.x, vec31.y, vec31.z);
         Vec3 vec3 = entity.getViewVector(1.0F);
         Vector3f vector3f = vec3.toVector3f().rotate(quaternionf);
 
-        projectile.shoot(vector3f.x(), vector3f.y(), vector3f.z(), 3.5f, 0.1f);
+        projectile.shoot(vector3f.x(), vector3f.y(), vector3f.z(), projectileVelocity, inaccuracy);
         projectile.setPos(entity.getEyePosition());
 
         level.addFreshEntity(projectile);
@@ -107,14 +112,14 @@ public class GunItem extends Item {
     public ItemStack getGunpowder(Player player, ItemStack itemStack) {
         int y = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, itemStack);
 
+        if (y != 0) {
+            return new ItemStack(Items.GUNPOWDER);
+        }
+
         for (int i = 0; i < player.getInventory().getContainerSize(); ++i) {
             ItemStack itemstack1 = player.getInventory().getItem(i);
             if (itemstack1.getItem() == Items.GUNPOWDER) {
-                if (y == 0) {
-                    return itemstack1;
-                } else {
-                    return new ItemStack(Items.GUNPOWDER);
-                }
+                return itemstack1;
             }
         }
 
@@ -236,8 +241,35 @@ public class GunItem extends Item {
 
         return damage + extraDamage;
     }
+
+    public boolean isValidRepairItem(ItemStack pToRepair, ItemStack pRepair) {
+        return pRepair.is(Items.IRON_INGOT) || super.isValidRepairItem(pToRepair, pRepair);
+    }
+
+    @Override
+    public boolean isDamageable(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public boolean isRepairable(ItemStack stack) {
+        return true;
+    }
+
     public void setAttackDamage(float damage) { this.damage = damage; }
 
     public boolean isTwoHanded() { return twoHanded; }
     public void setTwoHanded(boolean twoHanded) { this.twoHanded = twoHanded; }
+
+    public float getProjectileVelocity() { return projectileVelocity; }
+    public void setProjectileVelocity(float projectileVelocity) { this.projectileVelocity = projectileVelocity; }
+
+    public float getInaccuracy() { return inaccuracy; }
+    public void setInaccuracy(float inaccuracy) { this.inaccuracy = inaccuracy; }
+
+    public float getFovModifier() { return fovModifier; }
+    public void setFovModifier(float fovModifier) { this.fovModifier = fovModifier; }
+
+    public void setScoped(boolean scoped) { this.scoped = scoped; }
+    public boolean isScoped() { return scoped; }
 }

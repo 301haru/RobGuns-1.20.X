@@ -5,7 +5,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.client.IArmPoseTransformer;
-import net.robus.robguns.item.GunItem;
+import net.robus.robguns.item.mod_items.GunItem;
 
 public class FlintlockCockingPose implements IArmPoseTransformer {
 

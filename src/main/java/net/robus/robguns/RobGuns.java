@@ -14,7 +14,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.robus.robguns.client.ArmPoses;
 import net.robus.robguns.entity.ModEntities;
-import net.robus.robguns.entity.RoundBallProjectile;
+import net.robus.robguns.entity.mod_entities.custom_entities.DragonsBreathProjectile;
+import net.robus.robguns.entity.mod_entities.custom_entities.GubProjectile;
+import net.robus.robguns.entity.mod_entities.custom_entities.RoundBallProjectile;
 import net.robus.robguns.item.ModCreativeModTabs;
 import net.robus.robguns.item.ModItems;
 
@@ -39,6 +41,7 @@ public class RobGuns {
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
+
     }
 
     @SubscribeEvent
@@ -51,6 +54,8 @@ public class RobGuns {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(ModEntities.ROUND_BALL_PROJECTILE.get(), (context) -> new ThrownItemRenderer<RoundBallProjectile>(context));
+            EntityRenderers.register(ModEntities.DRAGONS_BREATH_PROJECTILE.get(), (context) -> new ThrownItemRenderer<DragonsBreathProjectile>(context));
+            EntityRenderers.register(ModEntities.GUB_PROJECTILE.get(), (context) -> new ThrownItemRenderer<GubProjectile>(context));
             ArmPoses.init();
         }
     }

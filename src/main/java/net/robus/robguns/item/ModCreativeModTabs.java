@@ -21,6 +21,8 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.FLINTLOCK.get());
                         pOutput.accept(ModItems.SCOPED_MUSKET.get());
                         pOutput.accept(ModItems.BLUNDERBUSS.get());
+                        pOutput.accept(ModItems.DRAGONS_BREATH.get());
+                        pOutput.accept(ModItems.GUB_GUN.get());
                         pOutput.accept(ModItems.ROUND_BALL.get());
                     })
                     .build());

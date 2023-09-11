@@ -1,0 +1,49 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"cock": {
+			"animation_length": 1,
+			"bones": {
+				"Lever": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [-90, 0, 0]
+						}
+					}
+				}
+			}
+		},
+		"fire": {
+			"animation_length": 0.04167,
+			"bones": {
+				"Lever": {
+					"rotation": {
+						"0.0": {
+							"vector": [-90, 0, 0]
+						},
+						"0.0417": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			}
+		},
+		"cocked": {
+			"loop": true,
+			"bones": {
+				"Lever": {
+					"rotation": {
+						"vector": [-90, 0, 0]
+					}
+				}
+			}
+		},
+		"uncocked": {
+			"loop": true
+		}
+	},
+	"geckolib_format_version": 2
+}

@@ -1,7 +1,6 @@
-package net.robus.robguns.entity;
+package net.robus.robguns.entity.mod_entities.custom_entities;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ItemSupplier;
@@ -14,18 +13,13 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.robus.robguns.entity.mod_entities.GunProjectile;
 import net.robus.robguns.item.ModItems;
 
-public class RoundBallProjectile extends Projectile implements ItemSupplier {
-    private float damage = 4;
+public class RoundBallProjectile extends GunProjectile implements ItemSupplier {
 
     public RoundBallProjectile(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-    }
-
-    @Override
-    protected void onHit(HitResult pResult) {
-        super.onHit(pResult);
     }
 
     @Override
@@ -36,12 +30,15 @@ public class RoundBallProjectile extends Projectile implements ItemSupplier {
         boolean flag = entity.getType() == EntityType.ENDERMAN;
         int k = entity.getRemainingFireTicks();
 
-        if (entity.hurt(damageSources().generic(), damage)) {
+        if (entity.hurt(damageSources().generic(), getDamage())) {
             if (flag) {
                 return;
             }
 
-            this.playSound(SoundEvents.GENERIC_EXPLODE, 1.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
+            if (disabledIFrames()) {
+                entity.invulnerableTime = 0;
+            }
+
             this.discard();
         } else {
             entity.setRemainingFireTicks(k);
@@ -54,11 +51,22 @@ public class RoundBallProjectile extends Projectile implements ItemSupplier {
         }
     }
 
+    public void makeParticle(int pParticleAmount) {
+        if (pParticleAmount > 0) {
+
+            for(int j = 0; j < pParticleAmount; ++j) {
+                this.level().addParticle(ParticleTypes.CRIT, this.getRandomX(0.5D), this.getRandomY(), this.getRandomZ(0.5D),
+                        0, 0, 0);
+            }
+
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
         if (this.tickCount >= 300) {
-            this.remove(RemovalReason.DISCARDED);
+            this.remove(Entity.RemovalReason.DISCARDED);
         }
 
         this.makeParticle(1);
@@ -73,12 +81,7 @@ public class RoundBallProjectile extends Projectile implements ItemSupplier {
         double d2 = this.getZ() + vec3.z;
         this.updateRotation();
 
-        double d5 = vec3.x;
-        double d6 = vec3.y;
-        double d7 = vec3.z;
-
-        if (this.level().getBlockStates(this.getBoundingBox()).noneMatch(BlockBehaviour.BlockStateBase::isAir) &&
-                this.level().getBlockStates(this.getBoundingBox()).noneMatch(BlockBehaviour.BlockStateBase::liquid)) {
+        if (this.level().getBlockStates(this.getBoundingBox()).anyMatch(BlockBehaviour.BlockStateBase::isSolid)) {
             this.discard();
         } else {
             this.setDeltaMovement(vec3.scale(1));
@@ -86,37 +89,7 @@ public class RoundBallProjectile extends Projectile implements ItemSupplier {
         }
     }
 
-    private void makeParticle(int pParticleAmount) {
-        if (pParticleAmount > 0) {
-
-            for(int j = 0; j < pParticleAmount; ++j) {
-                this.level().addParticle(ParticleTypes.CRIT, this.getRandomX(0.5D), this.getRandomY(), this.getRandomZ(0.5D),
-                        0, 0, 0);
-            }
-
-        }
-    }
-
-    @Override
-    protected void defineSynchedData() {
-
-    }
-
-    public void setDamage(float damage) { this.damage = damage; }
-
-    @Override
     public ItemStack getItem() {
         return ModItems.ROUND_BALL.get().getDefaultInstance();
-    }
-
-    @Override
-    public boolean shouldRenderAtSqrDistance(double pDistance) {
-        double d0 = this.getBoundingBox().getSize() * 4.0D;
-        if (Double.isNaN(d0)) {
-            d0 = 4.0D;
-        }
-
-        d0 *= 64.0D;
-        return pDistance < d0 * d0;
     }
 }

@@ -1,4 +1,4 @@
-package net.robus.robguns.item;
+package net.robus.robguns.item.mod_items;
 
 import net.minecraft.world.item.Item;
 

@@ -1,6 +1,5 @@
-package net.robus.robguns.item.GeoGunItems;
+package net.robus.robguns.item.mod_items;
 
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -13,46 +12,32 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.robus.robguns.entity.ModEntities;
-import net.robus.robguns.entity.RoundBallProjectile;
-import net.robus.robguns.item.GeoGunItem;
-import net.robus.robguns.item.GunItem;
+import net.robus.robguns.entity.mod_entities.custom_entities.RoundBallProjectile;
 import net.robus.robguns.item.ModItems;
-import net.robus.robguns.item.client.Blunderbuss.BlunderbussRenderer;
-import net.robus.robguns.item.client.ScopedMusket.ScopedMusketRenderer;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 
 import java.util.Random;
-import java.util.function.Consumer;
 
-public class BlunderbussItem extends GeoGunItem {
+public class ShotgunGunItem extends GeoGunItem {
+    private int projectileAmount = 5;
+    private boolean disableIFrames = false;
+
     private static final Random random = new Random();
 
-    public BlunderbussItem(Properties pProperties, int chargeTime, float damage) {
+    public ShotgunGunItem(Properties pProperties, boolean twoHanded, float damage, int chargeTime, int projectileAmount,
+                          boolean disableIFrames, float projectileVelocity, float inaccuracy, float fovModifier) {
         super(pProperties);
         setChargeTime(chargeTime);
         setAttackDamage(damage);
-        setTwoHanded(true);
-        SingletonGeoAnimatable.registerSyncedAnimatable(this);
-    }
-
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private BlunderbussRenderer renderer;
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (this.renderer == null)
-                    this.renderer = new BlunderbussRenderer();
-
-                return this.renderer;
-            }
-        });
+        setTwoHanded(twoHanded);
+        setProjectileAmount(projectileAmount);
+        setDisableIFrames(disableIFrames);
+        setProjectileVelocity(projectileVelocity);
+        setInaccuracy(inaccuracy);
+        setFovModifier(fovModifier);
     }
 
     @Override
@@ -80,8 +65,6 @@ public class BlunderbussItem extends GeoGunItem {
 
     @Override
     public void shoot(LivingEntity entity, Level level) {
-
-
         ItemStack itemStack = null;
 
         if (entity.getMainHandItem().getItem() instanceof GunItem) {
@@ -90,18 +73,19 @@ public class BlunderbussItem extends GeoGunItem {
             itemStack = entity.getOffhandItem();
         }
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < projectileAmount; i++) {
             RoundBallProjectile projectile = new RoundBallProjectile(ModEntities.ROUND_BALL_PROJECTILE.get(), level);
 
             projectile.setDamage(getAttackDamage(itemStack));
             projectile.setNoGravity(true);
+            projectile.setDisableIFrame(DisabledIFrames());
 
             Vec3 vec31 = entity.getUpVector(1.0F);
             Quaternionf quaternionf = (new Quaternionf()).setAngleAxis(0 * ((float) Math.PI / 180F), vec31.x, vec31.y, vec31.z);
             Vec3 vec3 = entity.getViewVector(1.0F);
             Vector3f vector3f = vec3.toVector3f().rotate(quaternionf);
 
-            projectile.shoot(vector3f.x(), vector3f.y(), vector3f.z(), 2.5f, 15f);
+            projectile.shoot(vector3f.x(), vector3f.y(), vector3f.z(), 2.5f, getInaccuracy());
             projectile.setPos(entity.getEyePosition());
 
             level.addFreshEntity(projectile);
@@ -122,9 +106,9 @@ public class BlunderbussItem extends GeoGunItem {
 
         if (isCharged(itemStack) && (!isTwoHanded() || itemStack == pPlayer.getMainHandItem())) {
             setCharged(itemStack, false);
-            shoot(pPlayer, pLevel);
             clearChargedProjectiles(itemStack);
             itemStack.hurtAndBreak(1, pPlayer, (p) -> p.broadcastBreakEvent(pPlayer.getUsedItemHand()));
+            shoot(pPlayer, pLevel);
             if (pLevel instanceof ServerLevel serverLevel) {
                 triggerAnim(pPlayer, GeoItem.getOrAssignId(pPlayer.getItemInHand(pUsedHand), serverLevel), "Controller", "shoot");
             }
@@ -133,10 +117,12 @@ public class BlunderbussItem extends GeoGunItem {
             if (ammo == null || ammo.isEmpty()) { ammo = new ItemStack(ModItems.ROUND_BALL.get()); gunpowder = new ItemStack(Items.GUNPOWDER); }
 
             if (!isTwoHanded() || itemStack == pPlayer.getMainHandItem()){
-                pPlayer.startUsingItem(pUsedHand);
-                setCharging(itemStack, true);
-                if (pLevel instanceof ServerLevel serverLevel) {
-                    triggerAnim(pPlayer, GeoItem.getOrAssignId(pPlayer.getItemInHand(pUsedHand), serverLevel), "Controller", "cock");
+                if (itemStack == pPlayer.getMainHandItem() || !(pPlayer.getMainHandItem().getItem() instanceof GunItem)) {
+                    pPlayer.startUsingItem(pUsedHand);
+                    setCharging(itemStack, true);
+                    if (pLevel instanceof ServerLevel serverLevel) {
+                        triggerAnim(pPlayer, GeoItem.getOrAssignId(pPlayer.getItemInHand(pUsedHand), serverLevel), "Controller", "cock");
+                    }
                 }
             }
         }
@@ -163,8 +149,6 @@ public class BlunderbussItem extends GeoGunItem {
                 }
 
                 addChargedProjectile(pStack, ammo);
-
-                pLevel.playSound(pLivingEntity, pLivingEntity.blockPosition(), SoundEvents.CROSSBOW_LOADING_END, SoundSource.PLAYERS, 1, 1);
             }
         } else if (!isCharged(pStack)) {
             if (pLevel instanceof ServerLevel serverLevel) {
@@ -179,11 +163,19 @@ public class BlunderbussItem extends GeoGunItem {
     public void onUseTick(Level pLevel, LivingEntity pLivingEntity, ItemStack pStack, int pRemainingUseDuration) {
         float f = (float)(pStack.getUseDuration() - pRemainingUseDuration);
 
-        if (f >= getChargeTime(pStack) - 1) {
+        if (f == getChargeTime(pStack) - 1 && !isCharged(pStack)) {
+            pLevel.playSound(pLivingEntity, pLivingEntity.blockPosition(), SoundEvents.CROSSBOW_LOADING_END, SoundSource.PLAYERS, 1, 1);
             if (pLevel instanceof ServerLevel serverLevel) {
                 triggerAnim(pLivingEntity, GeoItem.getOrAssignId(pStack, serverLevel), "Controller", "cocked");
             }
         }
         super.onUseTick(pLevel, pLivingEntity, pStack, pRemainingUseDuration);
     }
+
+    public void setProjectileAmount(int projectileAmount) { this.projectileAmount = projectileAmount; }
+    public int getProjectileAmount() { return this.projectileAmount; }
+
+    public void setDisableIFrames(boolean disableIFrames) { this.disableIFrames = disableIFrames; }
+    public boolean DisabledIFrames() { return disableIFrames; }
+
 }

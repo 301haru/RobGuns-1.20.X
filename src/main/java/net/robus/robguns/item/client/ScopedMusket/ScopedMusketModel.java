@@ -2,7 +2,7 @@ package net.robus.robguns.item.client.ScopedMusket;
 
 import net.minecraft.resources.ResourceLocation;
 import net.robus.robguns.RobGuns;
-import net.robus.robguns.item.GeoGunItems.ScopedMusketItem;
+import net.robus.robguns.item.mod_items.custom_items.ScopedMusketItem;
 import software.bernie.geckolib.model.GeoModel;
 
 public class ScopedMusketModel extends GeoModel<ScopedMusketItem> {

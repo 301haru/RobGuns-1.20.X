@@ -2,8 +2,7 @@ package net.robus.robguns.item.client.Blunderbuss;
 
 import net.minecraft.resources.ResourceLocation;
 import net.robus.robguns.RobGuns;
-import net.robus.robguns.item.GeoGunItems.BlunderbussItem;
-import net.robus.robguns.item.GeoGunItems.MusketItem;
+import net.robus.robguns.item.mod_items.custom_items.BlunderbussItem;
 import software.bernie.geckolib.model.GeoModel;
 
 public class BlunderbussModel extends GeoModel<BlunderbussItem> {

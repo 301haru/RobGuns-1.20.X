@@ -2,7 +2,7 @@ package net.robus.robguns.item.client.Flintlock;
 
 import net.minecraft.resources.ResourceLocation;
 import net.robus.robguns.RobGuns;
-import net.robus.robguns.item.GeoGunItems.FlintlockItem;
+import net.robus.robguns.item.mod_items.custom_items.FlintlockItem;
 import software.bernie.geckolib.model.GeoModel;
 
 public class FlintlockModel extends GeoModel<FlintlockItem> {
