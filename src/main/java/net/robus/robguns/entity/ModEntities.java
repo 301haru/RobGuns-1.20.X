@@ -19,7 +19,7 @@ public class ModEntities {
 
     public static final RegistryObject<EntityType<RoundBallProjectile>> ROUND_BALL_PROJECTILE =
             ENTITY_TYPES.register("round_ball_projectile",
-            () -> EntityType.Builder.of(RoundBallProjectile::new, MobCategory.MISC)
+            () -> EntityType.Builder.<RoundBallProjectile>of(RoundBallProjectile::new, MobCategory.MISC)
                     .sized(0.4f, 0.4f).updateInterval(20).clientTrackingRange(6)
                     .build(RobGuns.MODID + ":round_ball_projectile"));
 

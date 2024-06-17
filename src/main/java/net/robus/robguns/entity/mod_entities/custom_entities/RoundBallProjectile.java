@@ -1,8 +1,10 @@
 package net.robus.robguns.entity.mod_entities.custom_entities;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -13,13 +15,21 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.robus.robguns.entity.ModEntities;
 import net.robus.robguns.entity.mod_entities.GunProjectile;
 import net.robus.robguns.item.ModItems;
 
 public class RoundBallProjectile extends GunProjectile implements ItemSupplier {
+    private LivingEntity shooter;
 
-    public RoundBallProjectile(EntityType<? extends Projectile> pEntityType, Level pLevel) {
+    public RoundBallProjectile(EntityType<? extends RoundBallProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+    }
+
+    public RoundBallProjectile(Level pLevel, LivingEntity shooter)
+    {
+        super(ModEntities.ROUND_BALL_PROJECTILE.get(), pLevel);
+        this.shooter = shooter;
     }
 
     @Override
@@ -30,7 +40,8 @@ public class RoundBallProjectile extends GunProjectile implements ItemSupplier {
         boolean flag = entity.getType() == EntityType.ENDERMAN;
         int k = entity.getRemainingFireTicks();
 
-        if (entity.hurt(damageSources().generic(), getDamage())) {
+        DamageSource damagesource = this.damageSources().mobProjectile(this, shooter);
+        if (entity.hurt(damagesource, getDamage())) {
             if (flag) {
                 return;
             }

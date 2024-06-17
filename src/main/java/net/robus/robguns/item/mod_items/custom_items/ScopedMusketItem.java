@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 public class ScopedMusketItem extends SingleFireGunItem {
     public ScopedMusketItem(Properties pProperties) {
-        super(pProperties, 16, 40, 3.9f, true, true, 0.1f, 0.15f);
+        super(pProperties, 9, 40, 3.9f, true, true, 0.1f, 0.15f);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 

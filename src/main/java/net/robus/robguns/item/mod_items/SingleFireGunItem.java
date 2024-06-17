@@ -1,5 +1,7 @@
 package net.robus.robguns.item.mod_items;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -11,13 +13,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.robus.robguns.RobGuns;
 import net.robus.robguns.item.ModItems;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 
 import java.util.Random;
 
 public class SingleFireGunItem extends GeoGunItem {
     private static final Random random = new Random();
+    private boolean isZooming = false;
 
     public SingleFireGunItem(Properties pProperties, float damage, int chargeTime, float projectileVelocity, boolean twoHanded, boolean scoped,
                              float inaccuracy, float fovModifier) {
@@ -29,6 +36,8 @@ public class SingleFireGunItem extends GeoGunItem {
         setScoped(scoped);
         setInaccuracy(inaccuracy);
         setFovModifier(fovModifier);
+
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
     @Override
@@ -62,13 +71,14 @@ public class SingleFireGunItem extends GeoGunItem {
         ItemStack gunpowder = getGunpowder(pPlayer, itemStack);
 
         if (isScoped()) {
-            if (isCharged(itemStack) && (!isTwoHanded() || itemStack == pPlayer.getMainHandItem())) {
+            if (isCharged(itemStack) && (!isTwoHanded() || itemStack == pPlayer.getMainHandItem())) { // 장전된 상태에서 스코프 줌 한 상태.
                 pPlayer.startUsingItem(pUsedHand);
                 pLevel.playSound(pPlayer, pPlayer.blockPosition(), SoundEvents.SPYGLASS_USE, SoundSource.PLAYERS, 1, 1);
+                this.setZooming(true);
+            } else if (((ammo != null && !ammo.isEmpty()) && (gunpowder != null && !gunpowder.isEmpty())) || pPlayer.getAbilities().instabuild) { // 장전하는 상태
+                if (ammo == null || ammo.isEmpty() || gunpowder == null || gunpowder.isEmpty()) { ammo = new ItemStack(ModItems.ROUND_BALL.get()); gunpowder = new ItemStack(Items.GUNPOWDER); }
 
-            } else if (((ammo != null && !ammo.isEmpty()) && (gunpowder != null && !gunpowder.isEmpty())) || pPlayer.getAbilities().instabuild) {
-                if (ammo == null || ammo.isEmpty()) { ammo = new ItemStack(ModItems.ROUND_BALL.get()); gunpowder = new ItemStack(Items.GUNPOWDER); }
-
+                this.setZooming(false);
                 if (!isTwoHanded() || itemStack == pPlayer.getMainHandItem()){
                     if (itemStack == pPlayer.getMainHandItem() || !(pPlayer.getMainHandItem().getItem() instanceof GunItem)) {
                         pPlayer.startUsingItem(pUsedHand);
@@ -80,7 +90,7 @@ public class SingleFireGunItem extends GeoGunItem {
                 }
             }
         } else {
-            if (isCharged(itemStack) && (!isTwoHanded() || itemStack == pPlayer.getMainHandItem())) {
+            if (isCharged(itemStack) && (!isTwoHanded() || itemStack == pPlayer.getMainHandItem())) { // 일반 아이템 그냥 클릭하는 상태에서 장전된거라면 -> 발사
                 setCharged(itemStack, false);
                 clearChargedProjectiles(itemStack);
                 itemStack.hurtAndBreak(1, pPlayer, (p) -> p.broadcastBreakEvent(pPlayer.getUsedItemHand()));
@@ -90,12 +100,12 @@ public class SingleFireGunItem extends GeoGunItem {
                 }
                 pPlayer.stopUsingItem();
             } else if (((ammo != null && !ammo.isEmpty()) && (gunpowder != null && !gunpowder.isEmpty())) || pPlayer.getAbilities().instabuild) {
-                if (ammo == null || ammo.isEmpty()) {
+                if (ammo == null || ammo.isEmpty() || gunpowder == null || gunpowder.isEmpty()) {
                     ammo = new ItemStack(ModItems.ROUND_BALL.get());
                     gunpowder = new ItemStack(Items.GUNPOWDER);
                 }
 
-                if (!isTwoHanded() || itemStack == pPlayer.getMainHandItem()) {
+                if (!isTwoHanded() || itemStack == pPlayer.getMainHandItem()) { // 일반 머스킷 장전 시작
                     pPlayer.startUsingItem(pUsedHand);
                     setCharging(itemStack, true);
                     if (pLevel instanceof ServerLevel serverLevel) {
@@ -126,7 +136,7 @@ public class SingleFireGunItem extends GeoGunItem {
                 }
             } else if (i >= getChargeTime(pStack) && !isCharged(pStack)){
                 if (((ammo != null && !ammo.isEmpty()) && (gunpowder != null && !gunpowder.isEmpty())) || ((Player)pLivingEntity).getAbilities().instabuild) {
-                    if (ammo == null || ammo.isEmpty()){ ammo = new ItemStack(ModItems.ROUND_BALL.get()); gunpowder = new ItemStack(Items.GUNPOWDER); }
+                    if (ammo == null || ammo.isEmpty() || gunpowder == null || gunpowder.isEmpty()){ ammo = new ItemStack(ModItems.ROUND_BALL.get()); gunpowder = new ItemStack(Items.GUNPOWDER); }
 
                     setCharged(pStack, true);
                     if (!((Player) pLivingEntity).getAbilities().instabuild) {
@@ -141,12 +151,13 @@ public class SingleFireGunItem extends GeoGunItem {
                     triggerAnim(pLivingEntity, GeoItem.getOrAssignId(pStack, serverLevel), "Controller", "uncocked");
                 }
             }
+            this.setZooming(false);
             setCharging(pStack, false);
             super.releaseUsing(pStack, pLevel, pLivingEntity, pTimeCharged);
         } else {
             if (i >= getChargeTime(pStack) && !isCharged(pStack)) {
                 if (((ammo != null && !ammo.isEmpty()) && (gunpowder != null && !gunpowder.isEmpty())) || ((Player) pLivingEntity).getAbilities().instabuild) {
-                    if (ammo == null || ammo.isEmpty()) {
+                    if (ammo == null || ammo.isEmpty() || gunpowder == null || gunpowder.isEmpty()) {
                         ammo = new ItemStack(ModItems.ROUND_BALL.get());
                         gunpowder = new ItemStack(Items.GUNPOWDER);
                     }
@@ -180,5 +191,13 @@ public class SingleFireGunItem extends GeoGunItem {
             }
         }
         super.onUseTick(pLevel, pLivingEntity, pStack, pRemainingUseDuration);
+    }
+
+    public boolean isZooming() {
+        return isZooming;
+    }
+
+    private void setZooming(boolean zooming) {
+        isZooming = zooming;
     }
 }

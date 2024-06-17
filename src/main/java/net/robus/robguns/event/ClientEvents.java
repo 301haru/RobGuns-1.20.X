@@ -1,20 +1,39 @@
 package net.robus.robguns.event;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.robus.robguns.RobGuns;
 import net.robus.robguns.client.ArmPoses;
 import net.robus.robguns.client.gui.ModGui;
 import net.robus.robguns.item.mod_items.GunItem;
+import net.robus.robguns.item.mod_items.custom_items.ScopedMusketItem;
 
 public class ClientEvents {
     @Mod.EventBusSubscriber(modid = RobGuns.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
     public static class ClientForgeEvents {
+
+        @SubscribeEvent
+        public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
+            LocalPlayer player = Minecraft.getInstance().player;
+
+            if(player == null)
+                return;
+
+            if(player.getMainHandItem().getItem() instanceof ScopedMusketItem item && item.isZooming())
+                event.setCanceled(true);
+
+            if(player.getMainHandItem().getItem() instanceof GunItem && GunItem.isCharging(player.getMainHandItem()))
+                event.setCanceled(true);
+        }
 
         @SubscribeEvent
         public static void holdGunPost(RenderPlayerEvent event) {

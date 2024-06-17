@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class BlunderbussItem extends ShotgunGunItem {
     public BlunderbussItem(Properties pProperties) {
-        super(pProperties, true, 1.25f, 40, 20, true, 2.5f, 10f, 1);
+        super(pProperties, true, 2.5f, 40, 10, true, 2.5f, 4f, 1);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 

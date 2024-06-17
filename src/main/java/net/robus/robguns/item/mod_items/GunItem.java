@@ -42,7 +42,7 @@ public class GunItem extends Item {
     }
 
     public void shoot(LivingEntity entity, Level level) {
-        RoundBallProjectile projectile = new RoundBallProjectile(ModEntities.ROUND_BALL_PROJECTILE.get(), level);
+        RoundBallProjectile projectile = new RoundBallProjectile(level, entity);
 
         ItemStack itemStack = null;
 
@@ -95,14 +95,14 @@ public class GunItem extends Item {
     public ItemStack getProjectile(Player player, ItemStack itemStack) {
         int y =EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, itemStack);
 
+        if (y != 0) {
+            return new ItemStack(ModItems.ROUND_BALL.get());
+        }
+
         for (int i = 0; i < player.getInventory().getContainerSize(); ++i) {
             ItemStack itemstack1 = player.getInventory().getItem(i);
             if (itemstack1.getItem() instanceof RoundBallItem) {
-                if (y == 0) {
-                    return itemstack1;
-                } else {
-                    return new ItemStack(ModItems.ROUND_BALL.get());
-                }
+                return itemstack1;
             }
         }
 

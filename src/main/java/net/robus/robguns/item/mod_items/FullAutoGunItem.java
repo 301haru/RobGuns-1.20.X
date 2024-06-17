@@ -13,6 +13,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.robus.robguns.item.ModItems;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 
 import java.util.Random;
 
@@ -30,6 +31,8 @@ public class FullAutoGunItem extends GeoGunItem {
         setScoped(scoped);
         setInaccuracy(inaccuracy);
         setFovModifier(fovModifier);
+
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
     @Override

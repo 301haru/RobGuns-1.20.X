@@ -90,7 +90,6 @@ minecraft {
 
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
-            args '--nogui'
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -129,6 +128,12 @@ repositories {
     // }
 }
 
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+
+    config "${mod_id}.mixins.json"
+}
+
 dependencies {
     // Specify the version of Minecraft to use.
     // Any artifact can be supplied so long as it has a "userdev" classifier artifact and is a compatible patcher artifact.
@@ -152,6 +157,8 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -18,6 +18,7 @@ import net.robus.robguns.item.ModItems;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 
 import java.util.Random;
 
@@ -38,6 +39,8 @@ public class ShotgunGunItem extends GeoGunItem {
         setProjectileVelocity(projectileVelocity);
         setInaccuracy(inaccuracy);
         setFovModifier(fovModifier);
+
+        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
     @Override
@@ -74,7 +77,7 @@ public class ShotgunGunItem extends GeoGunItem {
         }
 
         for (int i = 0; i < projectileAmount; i++) {
-            RoundBallProjectile projectile = new RoundBallProjectile(ModEntities.ROUND_BALL_PROJECTILE.get(), level);
+            RoundBallProjectile projectile = new RoundBallProjectile(level, entity);
 
             projectile.setDamage(getAttackDamage(itemStack));
             projectile.setNoGravity(true);

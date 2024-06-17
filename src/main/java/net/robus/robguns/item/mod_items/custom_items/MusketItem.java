@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class MusketItem extends SingleFireGunItem {
     public MusketItem(Properties pProperties) {
-        super(pProperties, 12, 35, 3.5f, true, false, 1f, 1);
+        super(pProperties, 9, 35, 3.5f, true, false, 1f, 1);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
